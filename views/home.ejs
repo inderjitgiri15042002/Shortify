@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL Shortener</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body,
+      html {
+        font-family: Arial, Helvetica, sans-serif;
+        height: 100%;
+        width: 100%;
+        background-color: #f0f2f5;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px;
+        width: 100%;
+      }
+
+      h1,
+      h2 {
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      form {
+        background-color: #fff;
+        padding: 20px 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        max-width: 400px;
+        margin-bottom: 40px;
+      }
+
+      label {
+        font-weight: bold;
+        color: #444;
+      }
+
+      input[type="text"] {
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+      }
+
+      button {
+        padding: 10px;
+        font-size: 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .generated-link {
+        margin-bottom: 20px;
+        font-size: 18px;
+        color: #28a745;
+      }
+
+      .generated-link a {
+        color: #28a745;
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      .generated-link a:hover {
+        text-decoration: underline;
+      }
+
+      table {
+        width: 100%;
+        max-width: 1200px;
+        margin-top: 30px;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        text-align: left;
+        border: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #f8f9fa;
+        color: #333;
+      }
+
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      .url-card a {
+        color: #007bff;
+        text-decoration: none;
+      }
+
+      .url-card a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>URL Shortener</h1>
+
+      <% if (locals.id) { %>
+      <p class="generated-link">
+        URL Generated:
+        <a href="http://localhost:8001/url/<%= id %>">
+          http://localhost:8001/url/<%= id %>
+        </a>
+      </p>
+      <% } %>
+
+      <form method="POST" action="/url">
+        <label for="url">Enter Your Original URL</label>
+        <input
+          type="text"
+          name="url"
+          id="url"
+          placeholder="https://example.com"
+          required
+        />
+        <button type="submit">Generate</button>
+      </form>
+
+      <h2>All Shortened URLs</h2>
+
+      <% if (urls && urls.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Short ID</th>
+            <th>Original URL</th>
+            <th>Total Visits</th>
+            <th>Visit History</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% urls.forEach(url => { %>
+          <tr>
+            <td><%= url.shortId %></td>
+            <td>
+              <a href="<%= url.redirectURL %>" target="_blank">
+                <%= url.redirectURL %>
+              </a>
+            </td>
+            <td><%= url.visitHistory.length %></td>
+            <td>
+              <% if (url.visitHistory.length > 0) { %>
+              <ul>
+                <% url.visitHistory.forEach(visit => { %>
+                <li><%= new Date(visit.timestamps).toLocaleString() %></li>
+                <% }) %>
+              </ul>
+              <% } else { %>
+              <p>No visits yet.</p>
+              <% } %>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+      <% } else { %>
+      <p>No URLs have been shortened yet.</p>
+      <% } %>
+    </div>
+  </body>
+</html>
